@@ -49,7 +49,6 @@ def get_rows_email(info_list):
     # get all the rest of the rows 
     count = 2
     while count < len(indices) - 1:
-        print(count)
         # get consecutive occurences of "….."
         bottom_index = indices[count]
         top_index = indices[count + 1]
@@ -61,7 +60,6 @@ def get_rows_email(info_list):
         # add row_info to final_list
         final_list.extend(clean_row)
         count += 3
-        print(clean_row)
 
     return (final_list)
 
