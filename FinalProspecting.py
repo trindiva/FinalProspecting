@@ -99,19 +99,26 @@ def clean_rows_email(row_info):
 
     # Find the email and add it to clean_row
     email_indices = [i for i, s in enumerate(row_info) if '@' in s]
-    email_index = email_indices[0]
-    email = row_info[email_index]
-    email = email.split(' ', 1)[0]
-    clean_row.append(email)
+    if len(email_indices) > 0:
+        email_index = email_indices[0]
+        email = row_info[email_index]
+        email = email.split(' ', 1)[0]
+        clean_row.append(email)
+    else:
+        clean_row.append("EMAIL NOT FOUND")
 
     # Find the phone number and add it to clean row (direct if possible, HQ if not)
     phone_indices = [i for i, s in enumerate(row_info) if '(Direct)' in s]
     if len(phone_indices) == 0:
         phone_indices = [i for i, s in enumerate(row_info) if '(HQ)' in s]
-    phone_number_index = phone_indices[0]
-    phone_number = row_info[phone_number_index]
-    phone_number = phone_number[:14]
-    clean_row.append(phone_number)
+    
+    if len(phone_indices) > 0:
+        phone_number_index = phone_indices[0]
+        phone_number = row_info[phone_number_index]
+        phone_number = phone_number[:14]
+        clean_row.append(phone_number)
+    else:
+        clean_row.append("PHONE NUMBER NOT FOUND")
 
     return(clean_row)
 
