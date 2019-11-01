@@ -5,6 +5,36 @@ import os
 from tkinter import *
 from tkinter import filedialog
 
+# Get the path for raw data, name/directory for export file
+def get_paths():
+    paths = []
+    
+    # initialize ability to browse files
+    root = Tk()
+    root.withdraw()
+    
+    # user chooses raw data file
+    print("Select raw data file:")
+    root.rawdata =  filedialog.askopenfilename(initialdir = "/",title = "Select Raw Data File")
+    paths.append(root.rawdata)
+    print()
+
+    # user chooses how to name final, exported file
+    print("How would you like to name your finished file?")
+    final_file_name = input()
+    print()
+
+    print("Select export file:")
+    root.finalfile =  filedialog.askdirectory(initialdir = "/", title = "Select Export Location")
+    print(root.finalfile)
+
+    # get the final path
+    final_file_name += ".xlsx"
+    final_path = root.finalfile + "/" + final_file_name
+    paths.append(final_path)
+
+    return(paths)
+
 # Get the data frame of raw data, get info, and turn it into a list
 def info_data_email(raw_data_path):
     # get the raw data and read it
@@ -123,8 +153,9 @@ def clean_rows_email(row_info):
     return(clean_row)
 
 # Write final info into excel sheet
-def organize_info_email(raw_path, final_path):
-    info_list = info_data_email(raw_path)
+def organize_info_email():
+    paths = get_paths()
+    info_list = info_data_email(paths[0])
     final_list = get_rows_email(info_list)
 
     # elements are in order: name, title, company, industry, email, phone
@@ -137,34 +168,7 @@ def organize_info_email(raw_path, final_path):
     phone = final_list[5::6]
 
     final_df = pd.DataFrame(list(zip(name, title, company, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Industry", "Email", "Phone Number"])
-    final_df.to_excel(final_path, sheet_name='Sheet1', index=False)
-
-# Get the path for raw data, name/directory for export file
-def get_paths():
-    # initialize ability to browse files
-    root = Tk()
-    root.withdraw()
-    
-    # user chooses raw data file
-    print("Select raw data file:")
-    root.rawdata =  filedialog.askopenfilename(initialdir = "/",title = "Select Raw Data File")
-    print()
-
-    # user chooses how to name final, exported file
-    print("How would you like to name your finished file?")
-    final_file_name = input()
-    print()
-
-    print("Select export file:")
-    root.finalfile =  filedialog.askdirectory(initialdir = "/", title = "Select Export Location")
-    print(root.finalfile)
-
-    # get the final path
-    final_file_name += ".xlsx"
-    final_path = root.finalfile + "/" + final_file_name
-
-    # pass paths to organize_info_email (this function will do the rest)
-    organize_info_email(root.rawdata, final_path)
+    final_df.to_excel(paths[1], sheet_name='Sheet1', index=False)
 
 
-get_paths()
+organize_info_email()
