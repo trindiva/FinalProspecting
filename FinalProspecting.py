@@ -77,11 +77,19 @@ def get_rows_email(info_list):
     final_list.extend(clean_row)
     
     # get all the rest of the rows 
-    count = 2
+    count = 0
     while count < len(indices) - 1:
         # get consecutive occurences of "….."
         bottom_index = indices[count]
         top_index = indices[count + 1]
+
+        if top_index - bottom_index == 1:
+            try:
+                bottom_index = indices[count + 2]
+                top_index = indices[count + 3]
+                count += 2
+            except:
+                break
 
         # use indices to get row info from the cleaned_list
         row_info = info[bottom_index + 1:top_index]
@@ -89,7 +97,7 @@ def get_rows_email(info_list):
 
         # add row_info to final_list
         final_list.extend(clean_row)
-        count += 3
+        count += 1
 
     return (final_list)
 
@@ -118,6 +126,7 @@ def clean_rows_email(row_info):
     clean_row.extend(first_three)
 
     # Remove the country
+    print(row_info[:3])
     if ", " in row_info[3]:
         row_info.remove(row_info[3])
 
