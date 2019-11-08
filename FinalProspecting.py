@@ -126,7 +126,6 @@ def clean_rows_email(row_info):
     clean_row.extend(first_three)
 
     # Remove the country
-    print(row_info[:3])
     if ", " in row_info[3]:
         row_info.remove(row_info[3])
 
