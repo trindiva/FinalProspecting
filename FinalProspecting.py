@@ -162,6 +162,12 @@ def clean_rows_email(row_info):
 
     return(clean_row)
 
+# remove rows that are missing information
+def no_info_remover(df):
+    df_clean = df.dropna()
+
+    return(df_clean)
+
 # Write final info into excel sheet
 def organize_info_email():
     paths = get_paths()
@@ -178,7 +184,8 @@ def organize_info_email():
     phone = final_list[5::6]
 
     final_df = pd.DataFrame(list(zip(name, title, company, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Industry", "Email", "Phone Number"])
+    final_df = no_info_remover(final_df)
     final_df.to_excel(paths[1], sheet_name='Sheet1', index=False)
 
-
+    
 organize_info_email()
