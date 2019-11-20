@@ -145,7 +145,7 @@ def clean_rows_email(row_info):
         email = email.split(' ', 1)[0]
         clean_row.append(email)
     else:
-        clean_row.append("EMAIL NOT FOUND")
+        clean_row.append("")
 
     # Find the phone number and add it to clean row (direct if possible, HQ if not)
     phone_indices = [i for i, s in enumerate(row_info) if '(Direct)' in s]
@@ -158,7 +158,7 @@ def clean_rows_email(row_info):
         phone_number = phone_number[:14]
         clean_row.append(phone_number)
     else:
-        clean_row.append("PHONE NUMBER NOT FOUND")
+        clean_row.append("")
 
     return(clean_row)
 
