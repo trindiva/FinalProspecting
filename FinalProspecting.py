@@ -132,6 +132,8 @@ def clean_rows_email(row_info):
     # Check for industry; put "PLACEHOLDER!" if there is not one
     if "43" in row_info[3]:
         clean_row.append("")
+        clean_row = []
+        return(clean_row)
     else:
         clean_row.append(row_info[3])
 
