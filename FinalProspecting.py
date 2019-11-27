@@ -32,6 +32,7 @@ def get_paths():
     final_file_name += ".xlsx"
     final_path = root.finalfile + "/" + final_file_name
     paths.append(final_path)
+    print()
 
     return(paths)
 
@@ -79,6 +80,7 @@ def get_rows_email(info_list):
     # get all the rest of the rows 
     count = 0
     while count < len(indices) - 1:
+        print(count)
         # get consecutive occurences of "….."
         bottom_index = indices[count]
         top_index = indices[count + 1]
@@ -184,7 +186,13 @@ def organize_info_email():
     phone = final_list[5::6]
 
     final_df = pd.DataFrame(list(zip(name, title, company, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Industry", "Email", "Phone Number"])
-    final_df = no_info_remover(final_df)
+
+    print("Do you want rows with incomplete data? (Y/N)")
+    incomplete_data_answer = input()
+
+    if incomplete_data_answer == "N" or incomplete_data_answer == "No" or incomplete_data_answer == "no" or incomplete_data_answer == "n":
+        final_df = no_info_remover(final_df)
+
     final_df.to_excel(paths[1], sheet_name='Sheet1', index=False)
 
     
