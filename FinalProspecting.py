@@ -97,6 +97,10 @@ def get_rows_email(info_list):
         row_info = info[bottom_index + 1:top_index]
         clean_row = clean_rows_email(row_info)
 
+        # if there is nothing in clean_row, there must have been an error; break the while loop
+        if len(clean_row) == 0:
+            break
+
         # add row_info to final_list
         final_list.extend(clean_row)
         count += 1
@@ -107,66 +111,74 @@ def get_rows_email(info_list):
 def clean_rows_email(row_info):
     clean_row= []
     
-    # Remove all the elements between the title and the company name
-    if "B" in row_info:
-        row_info.remove("B")
+    # if there is an error, stop the processing and just create the database from the records that worked
+    try:
+        # Remove all the elements between the title and the company name
+        if "B" in row_info:
+            row_info.remove("B")
 
-    if "D" in row_info:
-        row_info.remove("D")
+        if "D" in row_info:
+            row_info.remove("D")
 
-    if "HQ" in row_info:
-        row_info.remove("HQ")
+        if "HQ" in row_info:
+            row_info.remove("HQ")
 
-    if "-" in row_info:
-        row_info.remove("-")
+        if "-" in row_info:
+            row_info.remove("-")
 
-    if "-" in row_info:
-        row_info.remove("-")
+        if "-" in row_info:
+            row_info.remove("-")
 
-    # Add in the first three elements (name, title, company name)
-    first_three = row_info[:3]
-    clean_row.extend(first_three)
+        # Add in the first three elements (name, title, company name)
+        first_three = row_info[:3]
+        clean_row.extend(first_three)
 
-    # Remove the country
-    if ", " in row_info[3]:
-        row_info.remove(row_info[3])
+        # Remove the country
+        if ", " in row_info[3]:
+            row_info.remove(row_info[3])
 
-    # Check for industry; put "PLACEHOLDER!" if there is not one
-    if "43" in row_info[3]:
-        clean_row.append("")
+        # Check for industry; put "PLACEHOLDER!" if there is not one
+        if "43" in row_info[3]:
+            clean_row.append("NaN")
+        else:
+            clean_row.append(row_info[3])
+
+        # Find the email and add it to clean_row
+        email_indices = [i for i, s in enumerate(row_info) if '@' in s]
+        if len(email_indices) > 0:
+            email_index = email_indices[0]
+            email = row_info[email_index]
+            email = email.split(' ', 1)[0]
+            clean_row.append(email)
+        else:
+            clean_row.append("NaN")
+
+        # Find the phone number and add it to clean row (direct if possible, HQ if not)
+        phone_indices = [i for i, s in enumerate(row_info) if '(Direct)' in s]
+        if len(phone_indices) == 0:
+            phone_indices = [i for i, s in enumerate(row_info) if '(HQ)' in s]
+    
+        if len(phone_indices) > 0:
+            phone_number_index = phone_indices[0]
+            phone_number = row_info[phone_number_index]
+            phone_number = phone_number[:14]
+            clean_row.append(phone_number)
+        else:
+            clean_row.append("NaN")
+
+        return(clean_row)
+    
+    # if there is an error, return an empty clean row
+    except:
         clean_row = []
         return(clean_row)
-    else:
-        clean_row.append(row_info[3])
-
-    # Find the email and add it to clean_row
-    email_indices = [i for i, s in enumerate(row_info) if '@' in s]
-    if len(email_indices) > 0:
-        email_index = email_indices[0]
-        email = row_info[email_index]
-        email = email.split(' ', 1)[0]
-        clean_row.append(email)
-    else:
-        clean_row.append("")
-
-    # Find the phone number and add it to clean row (direct if possible, HQ if not)
-    phone_indices = [i for i, s in enumerate(row_info) if '(Direct)' in s]
-    if len(phone_indices) == 0:
-        phone_indices = [i for i, s in enumerate(row_info) if '(HQ)' in s]
-    
-    if len(phone_indices) > 0:
-        phone_number_index = phone_indices[0]
-        phone_number = row_info[phone_number_index]
-        phone_number = phone_number[:14]
-        clean_row.append(phone_number)
-    else:
-        clean_row.append("")
-
-    return(clean_row)
 
 # remove rows that are missing information
 def no_info_remover(df):
     df_clean = df.dropna()
+    df_clean = df_clean[~df_clean.Industry.str.contains("NaN")]
+    df_clean = df_clean[~df_clean.Email.str.contains("NaN")]
+    df_clean = df_clean[~df_clean.PhoneNumber.str.contains("NaN")]
 
     return(df_clean)
 
@@ -185,7 +197,7 @@ def organize_info_email():
     email = final_list[4::6]
     phone = final_list[5::6]
 
-    final_df = pd.DataFrame(list(zip(name, title, company, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Industry", "Email", "Phone Number"])
+    final_df = pd.DataFrame(list(zip(name, title, company, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Industry", "Email", "PhoneNumber"])
 
     print("Do you want rows with incomplete data? (Y/N)")
     incomplete_data_answer = input()
