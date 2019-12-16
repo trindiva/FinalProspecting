@@ -80,7 +80,6 @@ def get_rows_email(info_list):
     # get all the rest of the rows 
     count = 0
     while count < len(indices) - 1:
-        print(count)
         # get consecutive occurences of "….."
         bottom_index = indices[count]
         top_index = indices[count + 1]
@@ -129,19 +128,15 @@ def clean_rows_email(row_info):
         if "-" in row_info:
             row_info.remove("-")
 
-        # Add in the first three elements (name, title, company name)
-        first_three = row_info[:3]
-        clean_row.extend(first_three)
-
-        # Remove the country
-        if ", " in row_info[3]:
-            row_info.remove(row_info[3])
+        # Add in the first four elements (name, title, company name, location)
+        first_four = row_info[:4]
+        clean_row.extend(first_four)
 
         # Check for industry; put "PLACEHOLDER!" if there is not one
-        if "43" in row_info[3]:
+        if "43" in row_info[4]:
             clean_row.append("NaN")
         else:
-            clean_row.append(row_info[3])
+            clean_row.append(row_info[4])
 
         # Find the email and add it to clean_row
         email_indices = [i for i, s in enumerate(row_info) if '@' in s]
@@ -190,14 +185,15 @@ def organize_info_email():
 
     # elements are in order: name, title, company, industry, email, phone
     # get evert sixth element for each type of info
-    name = final_list[0::6]
-    title = final_list[1::6]
-    company = final_list[2::6]
-    industry = final_list[3::6]
-    email = final_list[4::6]
-    phone = final_list[5::6]
+    name = final_list[0::7]
+    title = final_list[1::7]
+    company = final_list[2::7]
+    location = final_list[3::7]
+    industry = final_list[4::7]
+    email = final_list[5::7]
+    phone = final_list[6::7]
 
-    final_df = pd.DataFrame(list(zip(name, title, company, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Industry", "Email", "PhoneNumber"])
+    final_df = pd.DataFrame(list(zip(name, title, company, location, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Location", "Industry", "Email", "PhoneNumber"])
 
     print("Do you want rows with incomplete data? (Y/N)")
     incomplete_data_answer = input()
