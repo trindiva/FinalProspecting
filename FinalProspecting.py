@@ -4,6 +4,18 @@ from pandas import ExcelFile
 import os
 from tkinter import *
 from tkinter import filedialog
+from pywinauto import Desktop, Application
+from pywinauto.keyboard import send_keys
+import pywinauto
+import random
+import time
+import decimal
+from win32ctypes.pywin32 import win32api
+import pyautogui
+
+### position = pyautogui.position()
+###    print(position)
+
 
 # Get the path for raw data, name/directory for export file
 def get_paths():
@@ -203,5 +215,25 @@ def organize_info_email():
 
     final_df.to_excel(paths[1], sheet_name='Sheet1', index=False)
 
-    
-organize_info_email()
+
+### TESTING PYWINAUTO FROM HERE ON IN###
+def open_chrome():
+    chrome_dir = r'"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"'
+
+    chrome = Application(backend='uia')
+    chrome.start(chrome_dir + ' --force-renderer-accessibility --start-maximized')
+
+    time.sleep(float(decimal.Decimal(random.randrange(50, 150))/100))
+
+    send_keys("google.com {ENTER 2}")
+
+    time.sleep(float(decimal.Decimal(random.randrange(150, 300))/100))
+
+    pywinauto.mouse.click(button='left', coords=(1737, 99))
+
+    time.sleep(float(decimal.Decimal(random.randrange(150, 300))/100))
+
+
+#organize_info_email()
+
+open_chrome()
