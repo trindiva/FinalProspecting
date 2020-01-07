@@ -4,18 +4,6 @@ from pandas import ExcelFile
 import os
 from tkinter import *
 from tkinter import filedialog
-from pywinauto import Desktop, Application
-from pywinauto.keyboard import send_keys
-import pywinauto
-import random
-import time
-import decimal
-from win32ctypes.pywin32 import win32api
-import pyautogui
-
-### position = pyautogui.position()
-###    print(position)
-
 
 # Get the path for raw data, name/directory for export file
 def get_paths():
@@ -78,7 +66,7 @@ def get_rows_email(info_list):
     # get the first row (fencepost)
     
     # get index of first instance of "….."
-    first_index = indices[4]
+    first_index = indices[0]
     
     # use index to get info for first row from info
     row_info = info[:first_index]
@@ -90,22 +78,20 @@ def get_rows_email(info_list):
     final_list.extend(clean_row)
     
     # get all the rest of the rows 
-    count = 4
+    count = 0
     while count < len(indices) - 1:
+        print(count)
         # get consecutive occurences of "….."
-        try:
-            bottom_index = indices[count]
-            top_index = indices[count + 5]
-        except:
-            break
+        bottom_index = indices[count]
+        top_index = indices[count + 1]
 
-        #if top_index - bottom_index == 1:
-        #    try:
-        #        bottom_index = indices[count + 2]
-        #        top_index = indices[count + 3]
-        #        count += 2
-        #    except:
-        #        break
+        if top_index - bottom_index == 1:
+            try:
+                bottom_index = indices[count + 2]
+                top_index = indices[count + 3]
+                count += 2
+            except:
+                break
 
         # use indices to get row info from the cleaned_list
         row_info = info[bottom_index + 1:top_index]
@@ -117,7 +103,7 @@ def get_rows_email(info_list):
 
         # add row_info to final_list
         final_list.extend(clean_row)
-        count += 5
+        count += 1
 
     return (final_list)
 
@@ -128,38 +114,34 @@ def clean_rows_email(row_info):
     # if there is an error, stop the processing and just create the database from the records that worked
     try:
         # Remove all the elements between the title and the company name
-        #if "B" in row_info:
-        #    row_info.remove("B")
+        if "B" in row_info:
+            row_info.remove("B")
 
-        #if "D" in row_info:
-        #    row_info.remove("D")
+        if "D" in row_info:
+            row_info.remove("D")
 
-        #if "HQ" in row_info:
-        #    row_info.remove("HQ")
+        if "HQ" in row_info:
+            row_info.remove("HQ")
 
-        #if "-" in row_info:
-        #    row_info.remove("-")
+        if "-" in row_info:
+            row_info.remove("-")
 
-        #if "-" in row_info:
-        #    row_info.remove("-")
+        if "-" in row_info:
+            row_info.remove("-")
 
-        # Add in the first four elements (name, title, company name, location)
-        first_four = row_info[:2]
-        clean_row.extend(first_four)
+        # Add in the first three elements (name, title, company name)
+        first_three = row_info[:3]
+        clean_row.extend(first_three)
 
-        clean_row.append(row_info[7])
-        clean_row.append(row_info[8])
-        if "$" in row_info[10]:
-            clean_row.append("NaN")
-        else:
-            clean_row.append(row_info[10])
-
+        # Remove the country
+        if ", " in row_info[3]:
+            row_info.remove(row_info[3])
 
         # Check for industry; put "PLACEHOLDER!" if there is not one
-        #if "43" in row_info[4]:
-        #    clean_row.append("NaN")
-        #else:
-        #    clean_row.append(row_info[4])
+        if "43" in row_info[3]:
+            clean_row.append("NaN")
+        else:
+            clean_row.append(row_info[3])
 
         # Find the email and add it to clean_row
         email_indices = [i for i, s in enumerate(row_info) if '@' in s]
@@ -208,15 +190,14 @@ def organize_info_email():
 
     # elements are in order: name, title, company, industry, email, phone
     # get evert sixth element for each type of info
-    name = final_list[0::7]
-    title = final_list[1::7]
-    company = final_list[2::7]
-    location = final_list[3::7]
-    industry = final_list[4::7]
-    email = final_list[5::7]
-    phone = final_list[6::7]
+    name = final_list[0::6]
+    title = final_list[1::6]
+    company = final_list[2::6]
+    industry = final_list[3::6]
+    email = final_list[4::6]
+    phone = final_list[5::6]
 
-    final_df = pd.DataFrame(list(zip(name, title, company, location, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Location", "Industry", "Email", "PhoneNumber"])
+    final_df = pd.DataFrame(list(zip(name, title, company, industry, email, phone)), columns = ["Full Name", "Title", "Company", "Industry", "Email", "PhoneNumber"])
 
     print("Do you want rows with incomplete data? (Y/N)")
     incomplete_data_answer = input()
@@ -226,25 +207,5 @@ def organize_info_email():
 
     final_df.to_excel(paths[1], sheet_name='Sheet1', index=False)
 
-
-### TESTING PYWINAUTO FROM HERE ON IN###
-def open_chrome():
-    chrome_dir = r'"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"'
-
-    chrome = Application(backend='uia')
-    chrome.start(chrome_dir + ' --force-renderer-accessibility --start-maximized')
-
-    time.sleep(float(decimal.Decimal(random.randrange(50, 150))/100))
-
-    send_keys("google.com {ENTER 2}")
-
-    time.sleep(float(decimal.Decimal(random.randrange(150, 300))/100))
-
-    pywinauto.mouse.click(button='left', coords=(1737, 99))
-
-    time.sleep(float(decimal.Decimal(random.randrange(150, 300))/100))
-
-
-#organize_info_email()
-
-open_chrome()
+    
+organize_info_email()
