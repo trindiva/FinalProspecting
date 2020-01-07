@@ -66,7 +66,7 @@ def get_rows_email(info_list):
     # get the first row (fencepost)
     
     # get index of first instance of "….."
-    first_index = indices[0]
+    first_index = indices[4]
     
     # use index to get info for first row from info
     row_info = info[:first_index]
@@ -78,19 +78,22 @@ def get_rows_email(info_list):
     final_list.extend(clean_row)
     
     # get all the rest of the rows 
-    count = 0
+    count = 4
     while count < len(indices) - 1:
         # get consecutive occurences of "….."
-        bottom_index = indices[count]
-        top_index = indices[count + 1]
+        try:
+            bottom_index = indices[count]
+            top_index = indices[count + 5]
+        except:
+            break
 
-        if top_index - bottom_index == 1:
-            try:
-                bottom_index = indices[count + 2]
-                top_index = indices[count + 3]
-                count += 2
-            except:
-                break
+        #if top_index - bottom_index == 1:
+        #    try:
+        #        bottom_index = indices[count + 2]
+        #        top_index = indices[count + 3]
+        #        count += 2
+        #    except:
+        #        break
 
         # use indices to get row info from the cleaned_list
         row_info = info[bottom_index + 1:top_index]
@@ -102,7 +105,7 @@ def get_rows_email(info_list):
 
         # add row_info to final_list
         final_list.extend(clean_row)
-        count += 1
+        count += 5
 
     return (final_list)
 
@@ -113,30 +116,38 @@ def clean_rows_email(row_info):
     # if there is an error, stop the processing and just create the database from the records that worked
     try:
         # Remove all the elements between the title and the company name
-        if "B" in row_info:
-            row_info.remove("B")
+        #if "B" in row_info:
+        #    row_info.remove("B")
 
-        if "D" in row_info:
-            row_info.remove("D")
+        #if "D" in row_info:
+        #    row_info.remove("D")
 
-        if "HQ" in row_info:
-            row_info.remove("HQ")
+        #if "HQ" in row_info:
+        #    row_info.remove("HQ")
 
-        if "-" in row_info:
-            row_info.remove("-")
+        #if "-" in row_info:
+        #    row_info.remove("-")
 
-        if "-" in row_info:
-            row_info.remove("-")
+        #if "-" in row_info:
+        #    row_info.remove("-")
 
         # Add in the first four elements (name, title, company name, location)
-        first_four = row_info[:4]
+        first_four = row_info[:2]
         clean_row.extend(first_four)
 
-        # Check for industry; put "PLACEHOLDER!" if there is not one
-        if "43" in row_info[4]:
+        clean_row.append(row_info[7])
+        clean_row.append(row_info[8])
+        if "$" in row_info[10]:
             clean_row.append("NaN")
         else:
-            clean_row.append(row_info[4])
+            clean_row.append(row_info[10])
+
+
+        # Check for industry; put "PLACEHOLDER!" if there is not one
+        #if "43" in row_info[4]:
+        #    clean_row.append("NaN")
+        #else:
+        #    clean_row.append(row_info[4])
 
         # Find the email and add it to clean_row
         email_indices = [i for i, s in enumerate(row_info) if '@' in s]
