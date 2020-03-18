@@ -80,7 +80,6 @@ def get_rows_email(info_list):
     # get all the rest of the rows 
     count = 0
     while count < len(indices) - 1:
-        print(count)
         # get consecutive occurences of "….."
         bottom_index = indices[count]
         top_index = indices[count + 1]
@@ -134,14 +133,18 @@ def clean_rows_email(row_info):
         clean_row.extend(first_three)
 
         # Remove the country
-        if ", " in row_info[3]:
-            row_info.remove(row_info[3])
+        if len(row_info) >=4:
+            if ", " in row_info[3]:
+                row_info.remove(row_info[3])
 
         # Check for industry; put "PLACEHOLDER!" if there is not one
-        if "43" in row_info[3]:
-            clean_row.append("NaN")
+        if len(row_info) >=4:
+            if "43" in row_info[3]:
+                clean_row.append("NaN")
+            else:
+                clean_row.append(row_info[3])
         else:
-            clean_row.append(row_info[3])
+            clean_row.append("NaN")
 
         # Find the email and add it to clean_row
         email_indices = [i for i, s in enumerate(row_info) if '@' in s]
